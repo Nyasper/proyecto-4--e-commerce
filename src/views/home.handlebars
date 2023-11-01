@@ -1,0 +1,15 @@
+    <main>
+    <h1>{{title}}</h1>
+    {{#if admin}}
+    <ul>
+        {{#each data}}
+           <li class="nombre">{{this.charaName}}</li>
+        {{/each}}
+    </ul>
+       <p>Eres Admin</p>
+       {{else}}
+          <p>No eres Admin</p>
+    {{/if}}
+</main>
+
+    
