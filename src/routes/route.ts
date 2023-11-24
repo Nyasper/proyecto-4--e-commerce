@@ -1,6 +1,6 @@
 import express from 'express';
-import { createUser } from '../controllers/userController.js';
-import { renderAbout, renderAdmin, renderHome } from '../controllers/viewsControllers.js';
+import { registerUser , loginUser, logoutUser } from '../controllers/userController.js';
+import { renderAbout, renderHome ,renderLogin , renderProfile, renderRegister } from '../controllers/renderController.js';
 
 const router = express.Router();
 
@@ -10,13 +10,26 @@ const router = express.Router();
 router.get('/', renderHome);
 
 
+//Page Login
+router.get('/login', renderLogin)
+router.post('/login', loginUser)
+
+//Page Register
+router.get('/register', renderRegister)
+router.post('/register', registerUser)
+
+//Page Profile
+router.get('/profile', renderProfile)
+
+//Logout
+router.get('/logout', logoutUser)
+
+//Page Admin
+// router.get('/admin', renderAdmin)
+
 //Page About
 router.get('/about', renderAbout);
 
-//Page Admin
-router.get('/admin', renderAdmin)
 
-
-router.post('/admin/createUser', createUser)
 
 export default router;

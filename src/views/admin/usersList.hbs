@@ -1,0 +1,181 @@
+<div class="mx-auto mb-24">
+<h1 class="text-center text-5xl my-12 font-medium ">Registered Users</h1>
+<table class="text-lg text-center w-full  bg-slate-900 rounded-2xl">
+  <thead class="text-xl font-bold text-center ">
+    <tr>
+      <th class="py-4">ID</th>
+      <th>Email</th>
+      <th>User Name</th>
+      <th>Admin</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    {{#each users}}
+      <tr id="{{this.id}}">
+        <td>
+          {{this.id}}
+        </td>
+
+        <td>
+          <input type="email" name="email" class="emailInput bg-slate-800 text-center p-2 my-2 border-white border rounded-xl invalid:bg-red-950 focus:bg-slate-900" required value="{{this.email}}">
+        </td>
+
+        <td>
+          <input type="text" name="userName" class="userNameInput bg-slate-800 text-center p-2 my-1 border-white border rounded-xl invalid:bg-red-950 focus:bg-slate-900" required value="{{this.userName}}">
+        </td>
+
+        <td>
+          {{#if this.admin}}
+            <span class="font-bold text-xl">yes</span>
+          {{/if}}
+        </td>
+
+        <td>
+          {{#unless this.admin}}
+
+            <button class="deleteUser bg-slate-700 p-2 my-1">Delete</button>
+
+
+            <button type="submit" class="updateUser bg-slate-700 p-2 my-1 disabled:text-slate-500" disabled >Update</button>
+
+
+            <button class="cancelButton bg-slate-700 p-2 my-1 disabled:text-slate-500" disabled >Cancel</button>
+    
+          {{/unless}}
+        </td>
+        
+      </tr>
+    {{/each}}
+    
+  </tbody>
+</table>
+</div>
+<script>
+  
+  const deletesButtons = document.querySelectorAll('.deleteUser')
+
+  for (const deleteButton of deletesButtons) {
+
+    //VARIABLES
+
+    //update & cancel buttons
+    let updateButton = deleteButton.nextElementSibling
+    let cancelButton = updateButton.nextElementSibling
+
+
+    //email & userName initial values
+    let initialEmail = updateButton.parentElement.parentElement.children[1].children[0].value
+    let initialUserName = updateButton.parentElement.parentElement.children[2].children[0].value
+
+    //email & userNames actual Values
+    let user = {
+      id: deleteButton.parentElement.parentElement.id,
+      email: updateButton.parentElement.parentElement.children[1].children[0],
+      userName: updateButton.parentElement.parentElement.children[2].children[0]
+    }
+
+
+    //EVENTS
+
+
+    //delete event
+    deleteButton.addEventListener('click' , ()=>{
+
+      let confirmation = confirm(`delete user with ID ${user.id}?`);
+
+      if (confirmation) {
+        
+        fetch(`/admin/${user.id}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('error on delete user');
+            }
+            
+            alert(`user with id: ${user.id} deleted`);
+            window.location.reload();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+
+
+      }
+       
+    })
+    
+    //email input event
+
+    user.email.addEventListener('input',()=> {
+      if (user.email.value != initialEmail) {
+        updateButton.disabled = false
+        cancelButton.disabled = false
+        cancelButton.addEventListener('click',()=>{
+          user.email.value = initialEmail
+          cancelButton.disabled = true
+          updateButton.disabled = true
+        })
+      }
+
+      else {
+        updateButton.disabled = true
+        cancelButton.disabled = true
+      }
+
+      })
+
+    //userName input event
+
+    user.userName.addEventListener('input',()=> {
+
+      if (user.userName.value != initialUserName){
+        updateButton.disabled = false
+        cancelButton.disabled = false
+         cancelButton.addEventListener('click',()=>{
+          user.userName.value = initialUserName
+          cancelButton.disabled = true
+        })
+      }
+
+      else {
+        updateButton.disabled = true
+        cancelButton.disabled = true
+      }
+      
+  })
+
+  //update button click event
+  updateButton.addEventListener('click',()=>{
+    if (!updateButton.disabled && user.email.value.trim().length > 0 && user.email.value.trim().includes('@') && user.userName.value.trim().length > 0) {
+
+      fetch(`/admin/${user.id}`, {  
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email:user.email.value, userName:user.userName.value })
+          })
+          .then(Response => {
+            if (!Response.ok) {
+              throw new Error('error on update user');
+            }
+            console.log(Response)
+            alert(`user with id: ${user.id} updated`);
+            window.location.reload();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+
+    } else alert('Error: email or userName can`t be empty')
+  })
+
+  }
+
+</script>
